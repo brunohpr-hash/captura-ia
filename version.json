@@ -1,4 +1,4 @@
 {
-  "version": "1.0.2",
-  "changelog": "- Corrige o reinício automático após atualizar: o relançador agora é disparado ANTES de o app encerrar (antes havia uma corrida e o app morria primeiro).\n- Capturas pendentes: se a Groq pedir calma (limite por minuto), o app espera 30s e tenta de novo sozinho."
+  "version": "1.0.3",
+  "changelog": "- Corrige captura cortada (texto extraído pela metade, palavras truncadas à direita e final faltando): em telas com escala do Windows (125%, 150%), a área fotografada saía menor que a selecionada. O app agora trabalha em pixels reais da tela e o recorte bate exatamente com a sua seleção."
 }

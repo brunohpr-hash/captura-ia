@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.2"
+APP_VERSION = "1.0.3"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -83,6 +83,26 @@ ACTION_LABELS = {
 
 
 # ---------------------------------------------------------------- utilidades
+
+def enable_dpi_awareness():
+    """Com escala de tela do Windows (125%, 150%...), as coordenadas do
+    seletor (tkinter) e as da captura (ImageGrab) usam 'réguas' diferentes
+    e o recorte sai menor/deslocado. Declarar o processo como ciente de DPI
+    faz todo mundo usar pixels físicos reais."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)  # per-monitor v2
+            log("dpi: SetProcessDpiAwareness(2) OK")
+        except Exception:
+            ctypes.windll.user32.SetProcessDPIAware()
+            log("dpi: SetProcessDPIAware OK (fallback)")
+    except Exception as e:
+        log(f"dpi: falhou ({e})")
+
+
 
 def log(msg):
     try:
@@ -828,6 +848,7 @@ class CapturaApp:
 
     def run(self):
         APP_DIR.mkdir(parents=True, exist_ok=True)
+        enable_dpi_awareness()
         if not self.cfg.get("api_key"):
             self.open_settings()
 
