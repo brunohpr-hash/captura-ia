@@ -1,4 +1,4 @@
 {
-  "version": "1.0.4",
-  "changelog": "- Nova ação: 💬 Transcrever conversa — capture um print de WhatsApp/Telegram/e-mail e receba o diálogo organizado no formato [Nome — horário]: mensagem, com cada participante identificado (funciona com grupos de várias pessoas), ordem cronológica e o texto fiel de cada fala."
+  "version": "1.0.5",
+  "changelog": "- Mesma blindagem do Ditado IA: ronda preventiva religa o atalho Alt+C a cada 2 minutos, imune a 'atalho morto' após tumultos do Windows (atualizações, instalações etc.)."
 }

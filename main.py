@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.4"
+APP_VERSION = "1.0.5"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -659,6 +659,19 @@ class CapturaApp:
         except Exception as e:
             log(f"session_listener: erro fatal: {e}")
 
+    def _rehook_patrol(self):
+        """Ronda preventiva: religa o atalho a cada 2 minutos (o Windows
+        pode remover escutas da corrente durante tumultos como updates)."""
+        while True:
+            time.sleep(120)
+            try:
+                if self.busy:
+                    continue
+                self.register_hotkey()
+                log("ronda: atalho religado preventivamente")
+            except Exception as e:
+                log(f"ronda: falha ao religar ({e})")
+
     def _watchdog(self):
         intervalo = 15
         ultimo = time.monotonic()
@@ -876,6 +889,7 @@ class CapturaApp:
         # recuperação pós bloqueio/suspensão: canal oficial + reserva
         threading.Thread(target=self._session_listener, daemon=True).start()
         threading.Thread(target=self._watchdog, daemon=True).start()
+        threading.Thread(target=self._rehook_patrol, daemon=True).start()
 
         self.run_tray()
 
