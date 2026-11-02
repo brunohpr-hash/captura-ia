@@ -1,4 +1,4 @@
 {
-  "version": "1.0.3",
-  "changelog": "- Corrige captura cortada (texto extraído pela metade, palavras truncadas à direita e final faltando): em telas com escala do Windows (125%, 150%), a área fotografada saía menor que a selecionada. O app agora trabalha em pixels reais da tela e o recorte bate exatamente com a sua seleção."
+  "version": "1.0.4",
+  "changelog": "- Nova ação: 💬 Transcrever conversa — capture um print de WhatsApp/Telegram/e-mail e receba o diálogo organizado no formato [Nome — horário]: mensagem, com cada participante identificado (funciona com grupos de várias pessoas), ordem cronológica e o texto fiel de cada fala."
 }

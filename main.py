@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.3"
+APP_VERSION = "1.0.4"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -73,12 +73,28 @@ ACTION_PROMPTS = {
         "Use linguagem natural, não tradução literal. "
         "Responda SOMENTE com a tradução, sem comentários."
     ),
+    "conversa": (
+        "Esta imagem mostra uma conversa de mensagens (WhatsApp, Telegram, e-mail ou similar). "
+        "Transcreva-a como um diálogo organizado, uma linha em branco entre falas, no formato:\n"
+        "[Nome — horário]: mensagem\n\n"
+        "Regras:\n"
+        "- Identifique cada participante pelo nome que aparece; mensagens alinhadas à direita "
+        "(ou destacadas como enviadas) são de [Eu].\n"
+        "- Se o horário não estiver visível, omita o '— horário'.\n"
+        "- Preserve o texto das mensagens exatamente como está, incluindo os parágrafos "
+        "dentro de uma mesma mensagem.\n"
+        "- Mantenha a ordem cronológica. Ignore elementos de interface (✓✓, 'digitando...', datas de separação "
+        "podem virar uma linha como --- sexta-feira ---).\n"
+        "- NÃO resuma, NÃO comente, NÃO responda às mensagens. "
+        "Responda SOMENTE com o diálogo transcrito."
+    ),
 }
 
 ACTION_LABELS = {
     "extrair": "📋 Extrair texto",
     "explicar": "💡 Explicar",
     "traduzir": "🌍 Traduzir",
+    "conversa": "💬 Transcrever conversa",
 }
 
 
@@ -427,7 +443,7 @@ class CapturaApp:
         win.resizable(False, False)
         win.configure(bg="#1e1e28")
         # centro da tela
-        w, h = 340, 190
+        w, h = 340, 230
         sw, sh = win.winfo_screenwidth(), win.winfo_screenheight()
         win.geometry(f"{w}x{h}+{(sw - w) // 2}+{(sh - h) // 2}")
 
@@ -438,7 +454,7 @@ class CapturaApp:
             choice["v"] = a
             win.destroy()
 
-        for a in ("extrair", "explicar", "traduzir"):
+        for a in ("extrair", "explicar", "traduzir", "conversa"):
             tk.Button(win, text=ACTION_LABELS[a], width=24,
                       font=("Segoe UI", 10),
                       command=lambda a=a: pick(a)).pack(pady=3)
@@ -728,7 +744,7 @@ class CapturaApp:
         ttk.Label(frm, text="Ação padrão:").grid(row=1, column=0, sticky="w", pady=(8, 0))
         act_var = tk.StringVar(master=win, value=self.cfg.get("default_action", "perguntar"))
         ttk.Combobox(frm, textvariable=act_var,
-                     values=["perguntar", "extrair", "explicar", "traduzir"],
+                     values=["perguntar", "extrair", "explicar", "traduzir", "conversa"],
                      state="readonly", width=18).grid(row=1, column=1, sticky="w", pady=(8, 0))
         ttk.Label(frm, text="perguntar = mostra o menu",
                   foreground="#666").grid(row=1, column=2, sticky="w", pady=(8, 0))
