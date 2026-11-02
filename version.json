@@ -1,4 +1,4 @@
 {
-  "version": "1.0.1",
-  "changelog": "- Corrige o erro 404 na análise: o modelo de visão da Groq mudou (llama-4-scout foi aposentado em julho/2026); agora usamos o qwen/qwen3.8-27b, o modelo de visão oficial atual, com resposta direta (sem rascunho de raciocínio)."
+  "version": "1.0.2",
+  "changelog": "- Corrige o reinício automático após atualizar: o relançador agora é disparado ANTES de o app encerrar (antes havia uma corrida e o app morria primeiro).\n- Capturas pendentes: se a Groq pedir calma (limite por minuto), o app espera 30s e tenta de novo sozinho."
 }

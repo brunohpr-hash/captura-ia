@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.1"
+APP_VERSION = "1.0.2"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -243,8 +243,10 @@ def download_update(app_dir):
     return updated
 
 
-def restart_app():
-    """Reinicia o app (bootstrap pythonw desacoplado, padrão validado no Ditado IA)."""
+def restart_app(icon=None):
+    """Relança o app de forma deterministica: PRIMEIRO garante o bootstrap
+    no ar, DEPOIS derruba o icone/processo. (Corrige corrida em que o
+    processo morria antes de lancar o relancador.)"""
     script = Path(__file__).resolve()
     exe = sys.executable
     pyw = Path(exe).with_name("pythonw.exe")
@@ -252,7 +254,7 @@ def restart_app():
         exe = str(pyw)
     try:
         if os.name == "nt":
-            boot = ("import time,subprocess; time.sleep(2); "
+            boot = ("import time,subprocess; time.sleep(3); "
                     f"subprocess.Popen([{exe!r}, {str(script)!r}], "
                     f"cwd={str(script.parent)!r})")
             flags = 0x00000008 | 0x00000200  # DETACHED_PROCESS | NEW_PROCESS_GROUP
@@ -262,6 +264,11 @@ def restart_app():
             subprocess.Popen([exe, str(script)], cwd=str(script.parent))
     except Exception as e:
         log(f"restart falhou: {e}")
+    try:
+        if icon is not None:
+            icon.stop()
+    except Exception:
+        pass
     os._exit(0)
 
 
@@ -479,7 +486,16 @@ class CapturaApp:
                     if action not in ACTION_PROMPTS:
                         action = "extrair"
                     img = Image.open(f)
-                    out = pipe.analyze(img, action)
+                    try:
+                        out = pipe.analyze(img, action)
+                    except Exception as e1:
+                        resp = getattr(e1, "response", None)
+                        if resp is not None and getattr(resp, "status_code", 0) == 429:
+                            log("pendente: limite por minuto (429), aguardando 30s...")
+                            time.sleep(30)
+                            out = pipe.analyze(img, action)
+                        else:
+                            raise
                     if out:
                         append_history({
                             "ts": datetime.now().isoformat(timespec="seconds"),
@@ -517,12 +533,7 @@ class CapturaApp:
                 time.sleep(1)
                 espera += 1
             log(f"recuperacao: reiniciando o app apos {motivo}")
-            try:
-                if self.icon:
-                    self.icon.stop()
-            except Exception:
-                pass
-            restart_app()
+            restart_app(self.icon)
         except Exception as e:
             log(f"recuperacao falhou ({motivo}): {e}")
             self._recovering = False
@@ -657,12 +668,7 @@ class CapturaApp:
                 log(f"update: v{APP_VERSION} -> v{remote} ({', '.join(updated)})")
                 self.notify(f"Atualizado para v{remote}! Reiniciando...")
                 time.sleep(1.5)
-                try:
-                    if self.icon:
-                        self.icon.stop()
-                except Exception:
-                    pass
-                restart_app()
+                restart_app(self.icon)
             else:
                 self.notify("Falha ao baixar a atualização. Veja o app.log.")
 
