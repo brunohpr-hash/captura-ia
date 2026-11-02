@@ -1,4 +1,4 @@
 {
-  "version": "1.0.0",
-  "changelog": "Primeira versão do Captura IA: capture qualquer área da tela (Alt+C) e extraia o texto, peça uma explicação ou traduza — resultado já copiado. Nasce com atualização pela nuvem, histórico, pendentes offline e recuperação automática pós-bloqueio."
+  "version": "1.0.1",
+  "changelog": "- Corrige o erro 404 na análise: o modelo de visão da Groq mudou (llama-4-scout foi aposentado em julho/2026); agora usamos o qwen/qwen3.8-27b, o modelo de visão oficial atual, com resposta direta (sem rascunho de raciocínio)."
 }

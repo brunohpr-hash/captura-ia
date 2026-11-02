@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -47,7 +47,7 @@ DEFAULT_CONFIG = {
 PROVIDERS = {
     "groq": {
         "llm_url": "https://api.groq.com/openai/v1/chat/completions",
-        "vision_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "vision_model": "qwen/qwen3.8-27b",
     },
 }
 
@@ -185,6 +185,7 @@ class Pipeline:
             json={
                 "model": p["vision_model"],
                 "temperature": 0.2,
+                "reasoning_effort": "none",
                 "messages": [
                     {
                         "role": "user",
