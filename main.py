@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.5"
+APP_VERSION = "1.0.6"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -377,6 +377,7 @@ class CapturaApp:
         self.cfg = load_config()
         self.busy = False
         self._recovering = False
+        self._last_key_evt = 0.0  # pulso da escuta global (prova de vida)
         self.icon = None
         self._hotkey_handle = None
 
@@ -552,6 +553,16 @@ class CapturaApp:
             keyboard.unhook_all_hotkeys()
         except Exception:
             pass
+        # sentinela de vida: escuta TODO evento de tecla para marcar o pulso
+        try:
+            if getattr(self, "_pulse_hook", None) is not None:
+                try:
+                    keyboard.unhook(self._pulse_hook)
+                except Exception:
+                    pass
+            self._pulse_hook = keyboard.on_press(self._pulse)
+        except Exception:
+            self._pulse_hook = None
         self._hotkey_handle = keyboard.add_hotkey(
             self.cfg["hotkey"], self.on_hotkey,
             suppress=bool(self.cfg.get("suppress_keys", True)),
@@ -659,16 +670,43 @@ class CapturaApp:
         except Exception as e:
             log(f"session_listener: erro fatal: {e}")
 
+    def _pulse(self, _evt=None):
+        # chamado em QUALQUER evento de teclado — batimento cardíaco da escuta
+        self._last_key_evt = time.monotonic()
+
     def _rehook_patrol(self):
-        """Ronda preventiva: religa o atalho a cada 2 minutos (o Windows
-        pode remover escutas da corrente durante tumultos como updates)."""
+        """Ronda com prova de vida: religa o atalho a cada 2 min e TESTA a
+        escuta injetando tecla fantasma (F24). Religar nao basta se o motor
+        de escuta morreu (caso de campo Ditado 04/11/2026) — 2 falhas
+        seguidas confirmam gancho morto e o app se reinicia sozinho."""
+        falhas = 0
         while True:
             time.sleep(120)
             try:
-                if self.busy:
+                if self.busy or self._recovering:
                     continue
                 self.register_hotkey()
-                log("ronda: atalho religado preventivamente")
+                t0 = time.monotonic()
+                try:
+                    keyboard.press_and_release("f24")
+                except Exception:
+                    pass
+                time.sleep(1.0)
+                if self._last_key_evt >= t0:
+                    falhas = 0
+                    log("ronda: atalho religado e escuta VERIFICADA viva")
+                else:
+                    falhas += 1
+                    log(f"ronda: escuta NAO respondeu ao teste ({falhas}x)")
+                    if falhas >= 2:
+                        log("ronda: gancho morto confirmado — reiniciando o app")
+                        falhas = 0
+                        try:
+                            self.notify("Escuta do teclado travou — reiniciando sozinho…")
+                        except Exception:
+                            pass
+                        restart_app(self.icon)
+                        return
             except Exception as e:
                 log(f"ronda: falha ao religar ({e})")
 
