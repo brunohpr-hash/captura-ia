@@ -1,4 +1,4 @@
 {
-  "version": "1.0.10",
-  "changelog": "Diagnóstico do atalho: o log agora registra cada Alt+C recebido (ou ignorado), para investigar casos em que o app sobe 'surdo' após reiniciar."
+  "version": "1.0.11",
+  "changelog": "Atualizador à prova de cache: a verificação de versão e o download passam a ignorar o cache do GitHub/CDN — acaba o 'já está atualizado' quando há versão nova."
 }
