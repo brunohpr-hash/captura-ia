@@ -1,4 +1,4 @@
 {
-  "version": "1.0.8",
-  "changelog": "Blindagem anti-disparo-fantasma: os atalhos ficam surdos durante o teste de vida da ronda e a memoria de teclas presas e limpa a cada ciclo."
+  "version": "1.0.9",
+  "changelog": "Compatível com o novo limite da Groq (1.000 tokens de saída/minuto no plano grátis): respostas da IA limitadas a 900 tokens — corrige o erro 429 'Request too large' que deixava o app sem resposta."
 }

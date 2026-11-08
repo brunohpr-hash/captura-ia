@@ -27,7 +27,8 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.8"
+APP_VERSION = "1.0.9"
+MAX_OUT_TOKENS = 900  # Groq free: OTPM 1000/min; acima disso 429 "Request too large"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
 APP_DIR = Path(os.environ.get("APPDATA", str(Path.home()))) / "CapturaIA"
@@ -222,6 +223,7 @@ class Pipeline:
                 "model": p["vision_model"],
                 "temperature": 0.2,
                 "reasoning_effort": "none",
+                "max_tokens": MAX_OUT_TOKENS,
                 "messages": [
                     {
                         "role": "user",
