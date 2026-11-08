@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.9"
+APP_VERSION = "1.0.10"
 MAX_OUT_TOKENS = 900  # Groq free: OTPM 1000/min; acima disso 429 "Request too large"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
@@ -390,7 +390,9 @@ class CapturaApp:
             log("atalho ignorado: janela do teste de vida")
             return
         if self.busy:
+            log("atalho ignorado: captura anterior ainda em andamento (busy)")
             return
+        log("atalho recebido: iniciando captura")
         threading.Thread(target=self._capture_flow, daemon=True).start()
 
     def _capture_flow(self):
