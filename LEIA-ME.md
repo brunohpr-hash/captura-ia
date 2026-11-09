@@ -7,7 +7,7 @@ Irmão do Ditado IA: mesma chave Groq, mesmo esquema de atualização pela nuvem
 
 ## Como usar
 
-1. Pressione **Alt+C** (ou clique no ícone da bandeja → "Capturar agora")
+1. Pressione **Ctrl+Shift+C** (ou clique no ícone da bandeja → "Capturar agora")
 2. **Arraste** para selecionar a área da tela (Esc cancela)
 3. Escolha a ação: **Extrair texto**, **Explicar** ou **Traduzir**
 4. O resultado aparece numa janela e **já está copiado** — é só colar (Ctrl+V)

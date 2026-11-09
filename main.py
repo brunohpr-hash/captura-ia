@@ -27,7 +27,7 @@ import requests
 from PIL import Image, ImageDraw
 
 APP_NAME = "Captura IA"
-APP_VERSION = "1.0.11"
+APP_VERSION = "1.0.12"
 MAX_OUT_TOKENS = 900  # Groq free: OTPM 1000/min; acima disso 429 "Request too large"
 UPDATE_REPO = "brunohpr-hash/captura-ia"  # repositório oficial de atualizações
 UPDATE_RAW = f"https://raw.githubusercontent.com/{UPDATE_REPO}/main"
@@ -38,7 +38,7 @@ HISTORY_PATH = APP_DIR / "historico.jsonl"
 PENDING_DIR = APP_DIR / "pendentes"
 
 DEFAULT_CONFIG = {
-    "hotkey": "alt+c",
+    "hotkey": "ctrl+shift+c",  # padrão da suíte: Ctrl+Shift+primeira letra
     "suppress_keys": True,
     "provider": "groq",
     "api_key": "",
